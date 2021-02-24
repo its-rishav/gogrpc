@@ -30,7 +30,7 @@ func (s *server) NetworkService(ctx context.Context, networkkey *pb.NetworkKey) 
 	log.Printf("Received: %v", networkkey.GetKey())
 	for _, userkey := range s.userkeys {
 		if userkey.Key == networkkey.GetKey() {
-			array = append(array2, userkey)
+			array = append(array, userkey)
 		}
 	}
 	return &pb.UserKeys{Users: array}, nil
