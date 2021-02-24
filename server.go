@@ -25,15 +25,15 @@ const (
 )
 
 func (s *server) NetworkService(ctx context.Context, networkkey *pb.NetworkKey) (*pb.UserKeys, error) {
-	var array pb.UserKey
+	var array []*pb.UserKeys
 	// var n int = 27
 	log.Printf("Received: %v", networkkey.GetKey())
 	for _, userkey := range s.userkeys {
 		if userkey.Key == networkkey.GetKey() {
-			array = userkey
+			array = append(array, userkey)
 		}
 	}
-	return &pb.UserKeys{Users: *array}, nil
+	return &pb.UserKeys{Users: array}, nil
 	// return &pb.UserKeys{Users: make(map[]*pb.UserKey, )}, nil
 }
 
