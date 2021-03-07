@@ -4,7 +4,6 @@ import (
 	"context"
 	pb "interview/API"
 	"log"
-	"net"
 	"time"
 
 	"google.golang.org/grpc"
@@ -19,34 +18,27 @@ func main() {
 	}
 
 	networkClient := pb.NewNetworkServiceClient(grpcConn)
-	userClient := pb.NewUserServiceClient(grpcConn)
-	contactClient := pb.NewContactServiceClient(grpcConn)
-	interestsClient := pb.NewInterestsServiceClient(grpcConn)
+	// userClient := pb.NewUserServiceClient(grpcConn)
+	// contactClient := pb.NewContactServiceClient(grpcConn)
+	// interestsClient := pb.NewInterestsServiceClient(grpcConn)
 
-	lis, err := net.Listen("tcp", ":50051")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	r, err := networkClient.NetworkService(ctx, &pb.NetworkKey{Key: 12311})
+	defer cancel()
+	r, err := networkClient.GetNetworkMembers(ctx, &pb.NetworkKey{Key: 12})
 
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Members: %s", r.UserKeys())
+	log.Printf("Members: %v", r.GetUsers())
 
 	if err != nil {
 		panic(err)
 	}
-
-	grpcServer := grpc.NewServer()
 
 	/*
 		Register your service implimentation here, like so:
 
 		RegisterViewNetworkServiceServer(grpcServer, --your server implimentation here--)
 	*/
-	err = grpcServer.Serve(lis)
-
-	if err != nil {
-		panic(err)
-	}
 
 }

@@ -2,52 +2,79 @@ package main
 
 import (
 	"context"
-	"log"
-	"net"
+	"fmt"
 
 	pb "interview/API"
-
-	"google.golang.org/grpc"
 )
 
 type server struct {
 	pb.UnimplementedNetworkServiceServer
-	userkeys []pb.UserKey
 }
 
 type userserver struct {
 	pb.UnimplementedUserServiceServer
-	user pb.User
+}
+
+type networkData struct {
+	nKey  int64
+	nName string
+	ukeys []*pb.UserKey
+}
+
+type userData struct {
+	key  int64
+	name string
+}
+
+func getNetworkData() []networkData {
+	networkData := []networkData{
+		{
+			nKey:  12,
+			nName: "tft",
+			ukeys: []*pb.UserKey{
+				{Key: 3},
+				{Key: 6},
+				{Key: 7},
+			},
+		},
+		{
+			nKey:  15,
+			nName: "coderbhai",
+			ukeys: []*pb.UserKey{
+				{Key: 6},
+				{Key: 8},
+			},
+		},
+	}
+	return networkData
 }
 
 const (
 	port = ":50051"
 )
 
-func (s *server) getNetworkMembers(ctx context.Context, networkkey *pb.NetworkKey) (*pb.UserKeys, error) {
-	var array []*pb.UserKey
-	// var n int = 27
-	log.Printf("Received: %v", networkkey.GetKey())
-	for _, userkey := range s.userkeys {
-		if userkey.Key == networkkey.GetKey() {
-			array = append(array, &userkey)
+func (s *server) GetNetworkMembers(ctx context.Context, networkkey *pb.NetworkKey) (*pb.UserKeys, error) {
+	fmt.Println("Network Key received:", networkkey.Key)
+	networkData := getNetworkData()
+	for i := range networkData {
+		if networkData[i].nKey == networkkey.Key {
+			return &pb.UserKeys{Users: networkData[i].ukeys}, nil
 		}
 	}
-	return &pb.UserKeys{
-		Users: array,
-	}, nil
+	return nil, fmt.Errorf("No Network found for key: %v", networkkey.Key)
 	// return &pb.UserKeys{Users: make(map[]*pb.UserKey, )}, nil
 }
 
-func main() {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	pb.RegisterNetworkServiceServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+// func main() {
+// 	fmt.Println("gRPC server running")
+// 	lis, err := net.Listen("tcp", port)
+// 	if err != nil {
+// 		log.Fatalf("failed to listen: %v", err)
+// 	}
+// 	s := grpc.NewServer()
+// 	pb.RegisterNetworkServiceServer(s, &server{})
+// 	if err := s.Serve(lis); err != nil {
+// 		log.Fatalf("failed to serve: %v", err)
+// 	}
 
-}
+// }
