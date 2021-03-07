@@ -24,16 +24,18 @@ const (
 	port = ":50051"
 )
 
-func (s *server) NetworkService(ctx context.Context, networkkey *pb.NetworkKey) (*pb.UserKeys, error) {
-	var array []*pb.UserKeys
+func (s *server) getNetworkMembers(ctx context.Context, networkkey *pb.NetworkKey) (*pb.UserKeys, error) {
+	var array []*pb.UserKey
 	// var n int = 27
 	log.Printf("Received: %v", networkkey.GetKey())
 	for _, userkey := range s.userkeys {
 		if userkey.Key == networkkey.GetKey() {
-			array = append(array, userkey)
+			array = append(array, &userkey)
 		}
 	}
-	return &pb.UserKeys{Users: array}, nil
+	return &pb.UserKeys{
+		Users: array,
+	}, nil
 	// return &pb.UserKeys{Users: make(map[]*pb.UserKey, )}, nil
 }
 
