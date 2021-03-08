@@ -24,7 +24,7 @@ func TestGetNetworkMembers(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	userver := userserver{}
+	userver := server{}
 	ctx := context.Background()
 	key := &pb.UserKey{Key: 6}
 	response, err := userver.GetUser(ctx, key)
@@ -38,7 +38,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetCommonContacts(t *testing.T) {
-	contactserver := contactserver{}
+	contactserver := server{}
 	ctx := context.Background()
 	user1 := &pb.UserKey{Key: 3}
 	user2 := &pb.UserKey{Key: 6}
@@ -54,7 +54,7 @@ func TestGetCommonContacts(t *testing.T) {
 }
 
 func TestGetSharedInterests(t *testing.T) {
-	s := interestserver{}
+	s := server{}
 	ctx := context.Background()
 	user1 := &pb.UserKey{Key: 7}
 	user2 := &pb.UserKey{Key: 6}
@@ -66,5 +66,22 @@ func TestGetSharedInterests(t *testing.T) {
 	commonInterests := len(response.Interests)
 	if commonInterests != 1 {
 		t.Errorf("expected commonInterests: 2, got %v", commonInterests)
+	}
+}
+
+func TestViewNetworkMembers(t *testing.T) {
+	s := server{}
+	ctx := context.Background()
+	user := &pb.UserKey{Key: 3}
+	network := &pb.NetworkKey{Key: 12}
+	viewNetworkData := &pb.UserViewingNetwork{User: user, Network: network}
+	response, err := s.ViewNetworkMembers(ctx, viewNetworkData)
+	if err != nil {
+		fmt.Errorf("err %v", err)
+	}
+	memberCount := len(response.Members)
+
+	if memberCount != 2 {
+		t.Errorf("expected members: 2, got: %v", memberCount)
 	}
 }
