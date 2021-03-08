@@ -30,12 +30,6 @@ type userData struct {
 	interests []string
 }
 
-type memberData struct {
-	user      pb.User
-	contacts  *pb.Contacts
-	interests *pb.Interests
-}
-
 func getNetworkData() []networkData {
 	networkData := []networkData{
 		{
